@@ -1,0 +1,260 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Palvelututka | Aalto-yliopisto | Helsingin älykäs tietomalli 2025</title>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="MDL/material.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="palvelututka.css">
+    <link href="Cesium/Widgets/widgets.css" rel="stylesheet">
+
+    <!-- JS libraries -->
+    <script src="MDL/material.min.js"></script>
+    <script src="Cesium/Cesium.js"></script>
+    <script src="palvelututka.js"></script> <!-- Functionalities of the demo app, just to keep things a bit tidier -->
+    <script src="AaltoTools.js"></script> <!-- Some tools to manipulate 3D-Tiles datasets -->
+    
+</head>
+<body>
+
+    <!-- Always shows a header, even in smaller screens. -->
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+        <header class="mdl-layout__header">
+            <div class="mdl-layout__header-row">
+                <!-- Title -->
+                <span class="mdl-layout-title">Palvelututka</span>
+                <!-- Add spacer, to align navigation to the right -->
+                <div class="mdl-layout-spacer"></div>
+                <!-- Navigation. We hide it in small screens. -->
+                <nav class="mdl-navigation mdl-layout--large-screen-only">
+                    <a class="mdl-navigation__link" onclick="document.getElementById('dataUI').style.visibility = 'visible'; document.getElementById('UI-blokker').style.visibility = 'visible';">Aineistot &amp; rajapinnat</a>
+                    <a class="mdl-navigation__link" onclick="document.getElementById('librariesUI').style.visibility = 'visible'; document.getElementById('UI-blokker').style.visibility = 'visible';">Ohjelmisto</a>
+                    <a class="mdl-navigation__link" onclick="document.getElementById('creditsUI').style.visibility = 'visible'; document.getElementById('UI-blokker').style.visibility = 'visible';">Toteutus</a>
+                </nav>
+            </div>
+        </header>
+        <div class="mdl-layout__drawer">
+            <span class="mdl-layout-title">Palvelututka</span>
+            <nav class="mdl-navigation">
+                <a class="mdl-navigation__link" onclick="document.getElementById('dataUI').style.visibility = 'visible'; document.getElementById('UI-blokker').style.visibility = 'visible';">Aineistot &amp; rajapinnat</a>
+                <a class="mdl-navigation__link" onclick="document.getElementById('librariesUI').style.visibility = 'visible'; document.getElementById('UI-blokker').style.visibility = 'visible';">Ohjelmisto</a>
+                <a class="mdl-navigation__link" onclick="document.getElementById('creditsUI').style.visibility = 'visible'; document.getElementById('UI-blokker').style.visibility = 'visible';">Toteutus</a>
+            </nav>
+        </div>
+        <main class="mdl-layout__content">
+            <div class="page-content" id="page-content">
+
+
+
+
+                <div id="cesiumContainer">
+                </div>
+
+
+
+            </div>
+
+
+
+            <script>
+            //Create a cesiumViewer without imagery
+            var viewer = new Cesium.Viewer("cesiumContainer", {
+                animation: false,
+                fullscreenButton: false,
+                geocoder: false,
+                shadows: true,
+                navigationHelpButton: false,
+                timeline: false,
+                sceneModePicker: false,
+                baseLayerPicker: false,
+                homeButton: false,
+                imageryProvider: new Cesium.SingleTileImageryProvider({
+                    url: "Aalto_ENG_EN_21_BLACK_1.png",
+                    rectangle: Cesium.Rectangle.fromDegrees(-75.0, 28.0, -67.0, 29.75),
+                })
+            });
+
+            // Initilize content from HKI interfaces
+
+            // WMS-layer "Opaskartta"
+            initializeMap();
+
+            // Setup 3D Tiles dataset, Helsinki City Information Model
+            initializeInformationModel();
+
+            // Setup the viewport
+            initializeViewPort();
+
+
+        // Function for processing click
+        function processClick(eventPosition) {
+            if (spatialSearchTrigger == true) {
+            var earthPosition = viewer.camera.pickEllipsoid(eventPosition, viewer.scene.globe.ellipsoid); //Return the coordinates of the point above the ellipsoid
+            if (Cesium.defined(earthPosition)) {
+                var pos = Cesium.Cartographic.fromCartesian(earthPosition);
+                var lat = Cesium.Math.toDegrees(pos.latitude);
+                var lon = Cesium.Math.toDegrees(pos.longitude);
+                console.log("Clicked at:" + lat + " latitude, " + lon + " longitude.");
+                queryServiceMapSpatial(lat, lon);
+            }
+            }
+        }
+
+        // Attach click event listener
+        var handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
+        handler.setInputAction(function (event) {
+            processClick(event.position);
+        }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+            </script>
+    </div>
+
+    <div id="launchUI" class="demo-card-wide mdl-card mdl-shadow--2dp UI-card">
+        <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text">Palvelututka</h2>
+        </div>
+        <div class="mdl-card__supporting-text">
+            Palvelututka on Aalto-yliopiston toteuttama esimerkkisovellus Helsingin kaupungin <a href="https://dev.hel.fi/apis/service-map-backend-api">Service Map API</a> -rajapinnan</a> ja <a href="https://www.hel.fi/helsinki/fi/kaupunki-ja-hallinto/tietoa-helsingista/yleistietoa-helsingista/Helsinki-3d/miten-mallit-on-tehty/">3D-kaupunkimallin</a> yhdistämisestä.<br /><br />
+            Klikkaa sijaintia kaupunkimallista ja Palvelututka hakee 25 lähintä kohdetta rajapinnasta.
+        </div>
+        <div class="mdl-card__actions mdl-card--border">
+            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="launchSearch();">
+                Tee haku
+            </a>
+        </div>
+        <div class="mdl-card__menu">
+            <img src="hel_logo_white.png" alt="Helsingin kaupunki" style="height: 30px;" />
+            <img src="aalto_logo_white.png" alt="Aalto-yliopisto" style="height: 30px; margin-left: 10px;" />
+
+
+        </div>
+    </div>
+
+
+
+    <div id="completeUI" class="demo-card-wide mdl-card mdl-shadow--2dp UI-card" style="visibility: hidden;">
+        <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text">Piip piip!</h2>
+        </div>
+        <div class="mdl-card__supporting-text">
+            Haku valmis!<br /><br />
+            Voit halutessasi katsella kohteiden lisätietoja klikkaamalla kartalla näkyviä kohteita.
+        </div>
+        <div class="mdl-card__actions mdl-card--border">
+
+            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="document.getElementById('completeUI').style.visibility = 'hidden';">
+                Ok
+            </a>
+
+        </div>
+        <div class="mdl-card__menu">
+
+        </div>
+    </div>
+
+    <div id="UI-blokker">
+
+        <div id="dataUI" class="demo-card-wide mdl-card mdl-shadow--2dp INFO-card" style="visibility: hidden;">
+            <div class="mdl-card__title">
+                <h2 class="mdl-card__title-text">Aineistot &amp; rajapinnat</h2>
+            </div>
+            <div class="mdl-card__supporting-text">
+                <b>Helsingin 3D-kaupunkitietomalli</b><br />Helsingin kaupungin kaupunginkanslia, tietotekniikka- ja viestintäosasto
+                <br /><br /><b>Helsingin opaskartta</b><br />Helsingin kaupunkiympäristön toimiala / Kaupunkimittauspalvelut
+                <br /><br /><b>Service Map Backend API</b><br />Helsingin kaupunginkanslia / Tietohallinto
+            </div>
+            <div class="mdl-card__actions mdl-card--border">
+
+                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="document.getElementById('dataUI').style.visibility = 'hidden'; document.getElementById('UI-blokker').style.visibility = 'hidden';">
+                    Ok
+                </a>
+
+            </div>
+            <div class="mdl-card__menu">
+
+            </div>
+        </div>
+
+        <div id="creditsUI" class="demo-card-wide mdl-card mdl-shadow--2dp INFO-card" style="visibility: hidden;">
+            <div class="mdl-card__title">
+                <h2 class="mdl-card__title-text">Toteutus</h2>
+            </div>
+            <div class="mdl-card__supporting-text">
+               Palvelututka on toteutettu <a href="https://www.aalto.fi/en/school-of-engineering">Aalto-yliopiston Insinööritieteiden korkeakoulun</a> toimesta, osana Helsingin innovaatiorahaston tukemaa "Helsingin älykäs tietomalli 2025" -hanketta.<br /><br />
+                Ohjelmistokehitys: <a href="https://people.aalto.fi/juho-pekka.virtanen">J-P Virtanen</a> (Twitter: <a href="https://twitter.com/jpvirtan">@jpvirtan</a>)
+            </div>
+            <div class="mdl-card__actions mdl-card--border">
+
+                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="document.getElementById('creditsUI').style.visibility = 'hidden'; document.getElementById('UI-blokker').style.visibility = 'hidden';">
+                    Ok
+                </a>
+
+            </div>
+            <div class="mdl-card__menu">
+
+            </div>
+        </div>
+
+    </div>
+
+    <div id="librariesUI" class="demo-card-wide mdl-card mdl-shadow--2dp INFO-card" style="visibility: hidden;">
+        <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text">Ohjelmisto</h2>
+        </div>
+        <div class="mdl-card__supporting-text">
+		
+		<b>Palvelututka:</b><br/>
+		 Copyright 2021 Aalto University<br/><br/>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at<br/><br/>
+
+    <a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a><br/><br/>
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.<br/><br/>
+		
+            Palvelututkan kehityksessä on hyödynnetty seuraavia kirjastoja. Ulkoiset kirjastot niitä koskevien lisenssiehtojen mukaan<br /><br />
+            <a href="https://cesium.com/cesiumjs/"><b>CesiumJS</b></a> - 3D-kaupunkimallien sovelluskehitysalusta<br /><i>CesiumJS is released under the <a href="https://github.com/CesiumGS/cesium/blob/master/LICENSE.md">Apache 2.0 license </a> and is free for both commercial and non-commercial use.</i><br /><br />
+            <a href="https://getmdl.io/"><b>Material Design Lite</b></a> - käyttöliittymäkirjasto<br /><i> Copyright Google, 2015. Licensed under an Apache-2 license.</i><br /><br />
+ 
+
+        </div>
+        <div class="mdl-card__actions mdl-card--border">
+
+            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="document.getElementById('librariesUI').style.visibility = 'hidden'; document.getElementById('UI-blokker').style.visibility = 'hidden';">
+                Ok
+            </a>
+
+        </div>
+        <div class="mdl-card__menu">
+
+        </div>
+    </div>
+
+    </div>
+
+
+    <!-- Raised button with ripple -->
+    <button id="researchButton" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" style="visibility: hidden;" onclick="launchSearch();">
+        Tee uusi haku
+    </button>
+
+    <button id="resetButton" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" style="visibility: hidden;" onclick="resetSearch();">
+        Nollaa
+    </button>
+
+    </main>
+    </div>
+
+    <img src="Aalto_ENG_EN_21_BLACK_1.png" id="AaltoLogo" alt="Aalto-yliopisto" style="position: fixed; bottom: 0px; right: 0px; height: 200px; z-index: 1000;" />
+
+</body>
+</html>

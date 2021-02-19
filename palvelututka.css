@@ -1,0 +1,137 @@
+﻿body
+{
+}
+
+#cesiumContainer{
+    height: inherit;
+    width: inherit;
+}
+
+#page-content
+{
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+
+.cesium-infoBox {
+    min-height: 500px;
+}
+
+.cesium-infoBox-iframe{
+    min-height: 500px;
+}
+
+.mdl-navigation .mdl-button {
+    width: 200px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.mdl-navigation h8 {
+    margin-left: 10px;
+    text-decoration: underline;
+    margin-top: 10px;
+}
+
+.cesium-infoBox-description img {
+    width: 400px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.decriptionImage {
+    width: 400px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.mdl-layout__header-row {
+    background-color:rgb(61, 61, 61);
+}
+
+.UI-card {
+    margin-left: auto;
+    margin-right: auto;
+    z-index: 10000;
+    top: 100px;
+    margin-bottom: -300px;
+}
+
+
+
+.demo-card-wide > .mdl-card__menu {
+    color: white;
+}
+
+.demo-card-wide.mdl-card {
+    width: 512px;
+    background-image: url("palvelututka_blue.jpg");
+}
+
+.demo-card-wide > .mdl-card__title {
+    color: white;
+    height: 176px;
+}
+
+.mdl-card__actions {
+    background: white;
+}
+
+.mdl-card__supporting-text {
+    color: white;
+}
+
+.mdl-layout__drawer-button, .mdl-layout__header {
+    background-color: rgb(61, 61, 61);
+}
+
+.mdl-card__title-text {
+    font-weight: bold;
+}
+
+.mdl-layout-title {
+    font-weight: bold;
+}
+
+#resetButton {
+    position: absolute;
+    top: 80px;
+    right: 200px;
+    z-index: 10000;
+}
+
+#researchButton {
+    position: absolute;
+    top: 80px;
+    right: 20px;
+    z-index: 10000;
+}
+
+#UI-blokker {
+    visibility: hidden;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 10005;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.INFO-card {
+    position: absolute;
+    z-index: 10010;
+    top: 50px;
+    left: calc(50% - 256px);
+    margin-bottom: -300px;
+    min-height: 512px;
+
+}
+
+a{
+color: lightpink;
+}
