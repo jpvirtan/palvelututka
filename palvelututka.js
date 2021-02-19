@@ -1,6 +1,6 @@
 // JavaScript source code
 // Initialization stuff
-Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJhYzI2MWMyMi1kZDcwLTRiOGYtYmY1MS1kN2E1Mzc3NDgzZTgiLCJpZCI6NDQ1OSwiaWF0IjoxNjAwMjYwMjY3fQ.diYc8wQUIW0V9Jpl3YzyrAgTWF6riB8J2_pxLnb9cKo';
+Cesium.Ion.defaultAccessToken = '';
 
 // Global configuration variables 
 var wmsURL = "https://kartta.hel.fi/ws/geoserver/avoindata/ows?SERVICE=WMS&";
