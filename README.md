@@ -1,6 +1,7 @@
 # Palvelututka
 
 An example application utilizing the API services of the City of Helsinki on the CesiumJS platform. 
+The live demo is available at: https://foto.aalto.fi/palvelututka/
  
 The application uses the following geospatial data assets and interfaces:
 * The city information model - Maintained by: Helsingin kaupungin kaupunginkanslia, tietotekniikka- ja viestintäosasto
